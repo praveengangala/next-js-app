@@ -12,6 +12,5 @@ jobs:
 
     - name: Build and push Docker image
       run: |
-        docker build -t my-image-name .
-        docker tag my-image-name mydockerhubuser/my-image-name:latest
-        docker push mydockerhubuser/my-image-name:latest
+        docker build -t praveengangala/nodejs-actions:latest .
+        docker push praveengangala/nodejs-actions:latest
