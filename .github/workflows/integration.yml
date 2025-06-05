@@ -1,15 +1,10 @@
-
 name: Integration
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  workflow_dispatch:  # 👈 Manual trigger from GitHub UI
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -25,12 +20,10 @@ jobs:
         cache: 'npm'
     - name: "Installing Dependencies"
       run: npm i
-
     - name: "Build command"
       run: npm run build
 
   unit-tests:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -46,6 +39,5 @@ jobs:
         cache: 'npm'
     - name: "Installing Dependencies"
       run: npm i
-
     - name: "Running test cases"
       run: npm run test
