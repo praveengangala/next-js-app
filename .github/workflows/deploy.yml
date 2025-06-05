@@ -1,8 +1,15 @@
+name: Deploy
+
+on:
+  workflow_dispatch:  # 👈 Manual trigger
+
 jobs:
   docker-build-and-push:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -10,7 +17,13 @@ jobs:
     - name: Docker Login
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-    - name: Build and push Docker image
+    - name: Set Docker Image Tag
+      run: echo "IMAGE_TAG=latest" >> $GITHUB_ENV
+
+    - name: Build Docker image
       run: |
-        docker build -t praveengangala/nodejs-actions:latest .
-        docker push praveengangala/nodejs-actions:latest
+        docker build -t praveengangala/nodejs-actions:${{ env.IMAGE_TAG }} .
+
+    - name: Push Docker image
+      run: |
+        docker push praveengangala/nodejs-actions:${{ env.IMAGE_TAG }}
