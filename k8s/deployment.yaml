@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: nodejs
-        image: praveengangala/nodejs-actions:latest
+        image: praveengangala/nodejs-actions
         ports:
         - containerPort: 3000
 
