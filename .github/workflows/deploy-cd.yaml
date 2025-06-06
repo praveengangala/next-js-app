@@ -1,0 +1,32 @@
+name: Deploy to Minikube
+
+on:
+  workflow_dispatch:  # manual trigger
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Copy Kubernetes YAMLs to Minikube server
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        source: "k8s/"
+        target: "~/k8s/"
+
+    - name: Deploy to Minikube using kubectl
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          kubectl apply -f ~/k8s/deployment.yaml
+          kubectl apply -f ~/k8s/service.yaml
+          kubectl rollout status deployment/nodejs-app
