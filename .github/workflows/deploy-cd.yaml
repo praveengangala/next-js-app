@@ -1,7 +1,7 @@
 name: Deploy to Minikube
 
 on:
-  workflow_dispatch:  # manual trigger
+  workflow_dispatch:  # Allows manual trigger from GitHub UI
 
 jobs:
   deploy:
@@ -14,11 +14,11 @@ jobs:
     - name: Copy Kubernetes YAMLs to Minikube server
       uses: appleboy/scp-action@v0.1.4
       with:
-        host: ${{ secrets.SSH_HOST }}
-        username: ${{ secrets.SSH_USER }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        source: "k8s/"
-        target: "~/k8s/"
+        host: ${{ secrets.SSH_HOST }}               # EC2 public IP or DNS
+        username: ${{ secrets.SSH_USER }}           # Usually 'ec2-user'
+        key: ${{ secrets.SSH_PRIVATE_KEY }}         # SSH private key (PEM format)
+        source: "k8s/"                              # Local folder in repo
+        target: "~/k8s/"                            # Remote target path on EC2
 
     - name: Deploy to Minikube using kubectl
       uses: appleboy/ssh-action@v1.0.0
@@ -27,6 +27,12 @@ jobs:
         username: ${{ secrets.SSH_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
+          echo "✅ Applying deployment and service files"
           kubectl apply -f ~/k8s/deployment.yaml
           kubectl apply -f ~/k8s/service.yaml
+
+          echo "🔄 Waiting for rollout to complete"
           kubectl rollout status deployment/nodejs-app
+
+          echo "📋 Current resources in the cluster:"
+          kubectl get all -o wide
